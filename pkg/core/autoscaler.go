@@ -17,6 +17,7 @@ import (
 )
 
 const (
+	metricsTypeLabel             = "type"
 	requestsPerSecondName        = "requests-per-second"
 	metricConfigJSONPath         = "metric-config.pods.%s.json-path/path"
 	metricConfigJSONKey          = "metric-config.pods.%s.json-path/json-key"
@@ -179,7 +180,11 @@ func sqsMetric(metrics zv1.AutoscalerMetrics) (*autoscaling.MetricSpec, error) {
 			Metric: autoscaling.MetricIdentifier{
 				Name: sqsQueueLengthTag,
 				Selector: &metav1.LabelSelector{
-					MatchLabels: map[string]string{sqsQueueNameTag: metrics.Queue.Name, sqsQueueRegionTag: metrics.Queue.Region},
+					MatchLabels: map[string]string{
+						metricsTypeLabel:  sqsQueueLengthTag,
+						sqsQueueNameTag:   metrics.Queue.Name,
+						sqsQueueRegionTag: metrics.Queue.Region,
+					},
 				},
 			},
 			Target: autoscaling.MetricTarget{
@@ -313,6 +318,7 @@ func zmonMetric(metrics zv1.AutoscalerMetrics, stackName, namespace string) (*au
 				Name: zmonCheckMetricName,
 				Selector: &metav1.LabelSelector{
 					MatchLabels: map[string]string{
+						metricsTypeLabel:     zmonCheckMetricName,
 						zmonCheckCheckIDTag:  metrics.ZMON.CheckID,
 						zmonCheckDurationTag: metrics.ZMON.Duration,
 						// uniquely identifies the metric to this

@@ -215,8 +215,8 @@ func TestStackSetController_ReconcileAutoscalersSQS(t *testing.T) {
 	require.Len(t, hpa.Spec.Metrics, 1, "expected HPA to have 1 metric. instead got %d", len(hpa.Spec.Metrics))
 	externalMetric := hpa.Spec.Metrics[0]
 	require.Equal(t, externalMetric.Type, autoscaling.ExternalMetricSourceType)
-	require.Equal(t, externalMetric.External.Metric.Name, "sqs-queue-length")
-	require.Equal(t, externalMetric.External.Metric.Selector.MatchLabels["queue-name"], "test-queue")
+	require.Equal(t, externalMetric.External.Metric.Name, sqsQueueLengthTag)
+	require.Equal(t, externalMetric.External.Metric.Selector.MatchLabels[metricsTypeLabel], sqsQueueLengthTag)
 	require.Equal(t, externalMetric.External.Metric.Selector.MatchLabels["queue-name"], "test-queue")
 	require.Equal(t, externalMetric.External.Target.AverageValue.Value(), int64(80))
 }
@@ -279,6 +279,7 @@ func TestStackSetController_ReconcileAutoscalersZMON(t *testing.T) {
 	externalMetric := hpa.Spec.Metrics[0]
 	require.Equal(t, externalMetric.Type, autoscaling.ExternalMetricSourceType)
 	require.Equal(t, externalMetric.External.Metric.Name, zmonCheckMetricName)
+	require.Equal(t, externalMetric.External.Metric.Selector.MatchLabels[metricsTypeLabel], zmonCheckMetricName)
 	require.Equal(t, externalMetric.External.Metric.Selector.MatchLabels[zmonCheckCheckIDTag], "1234")
 	require.Equal(t, externalMetric.External.Metric.Selector.MatchLabels[zmonCheckDurationTag], "10m")
 	require.Equal(t, externalMetric.External.Metric.Selector.MatchLabels[zmonCheckAggregatorsTag], "avg,max")
